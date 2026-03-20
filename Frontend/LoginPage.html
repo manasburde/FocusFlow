@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-[#f3f4f6] h-screen flex items-center justify-center font-sans">
+
+    <div class="bg-white p-10 rounded-xl shadow-sm border border-gray-100 w-full max-w-[440px]">
+
+        <div id="loginForm" class="block">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-[#2563eb] mb-2 tracking-tight">FocusFlow</h1>
+                <p class="text-gray-500">Sign in to your account</p>
+            </div>
+
+            <form onsubmit="handleAuth(event)">
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="email">Email Address</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="email" id="email" placeholder="student@university.edu" required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="password">Password</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-[#2563eb] text-white font-bold py-2.5 rounded-md hover:bg-blue-700 transition-colors">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-8 flex items-center justify-between">
+                <span class="border-b w-1/5 lg:w-1/4 border-gray-200"></span>
+                <span class="text-xs text-center text-gray-500 uppercase font-medium tracking-wide">Or continue
+                    with</span>
+                <span class="border-b w-1/5 lg:w-1/4 border-gray-200"></span>
+            </div>
+
+            <button
+                class="w-full mt-6 bg-white border border-gray-300 text-gray-700 font-medium py-2.5 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center gap-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M22.56 12.25C22.56 11.47 22.49 10.74 22.36 10.04H12V14.24H17.92C17.67 15.6 16.89 16.74 15.74 17.51V20.24H19.3C21.38 18.32 22.56 15.54 22.56 12.25Z"
+                        fill="#4285F4" />
+                    <path
+                        d="M12 23C14.97 23 17.46 22.02 19.3 20.24L15.74 17.51C14.75 18.17 13.48 18.57 12 18.57C9.13 18.57 6.69 16.63 5.8 14.04H2.12V16.89C3.96 20.55 7.68 23 12 23Z"
+                        fill="#34A853" />
+                    <path
+                        d="M5.8 14.04C5.57 13.36 5.44 12.64 5.44 11.88C5.44 11.12 5.57 10.4 5.8 9.72V6.87H2.12C1.35 8.41 0.92 10.09 0.92 11.88C0.92 13.67 1.35 15.35 2.12 16.89L5.8 14.04Z"
+                        fill="#FBBC05" />
+                    <path
+                        d="M12 5.19C13.62 5.19 15.07 5.74 16.21 6.83L19.37 3.67C17.46 1.88 14.97 0.75 12 0.75C7.68 0.75 3.96 3.2 2.12 6.87L5.8 9.72C6.69 7.13 9.13 5.19 12 5.19Z"
+                        fill="#EA4335" />
+                </svg>
+                Sign in with Google
+            </button>
+
+            <p class="mt-8 text-center text-sm text-gray-600">
+                Don't have an account?
+                <button onclick="toggleView()" class="text-[#2563eb] font-semibold hover:underline">Sign up
+                    here</button>
+            </p>
+        </div>
+
+        <div id="signupForm" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-[#2563eb] mb-2 tracking-tight">FocusFlow</h1>
+                <p class="text-gray-500">Create your account</p>
+            </div>
+
+            <form onsubmit="handleAuth(event)">
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="signup-name">Full Name</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="text" id="signup-name" placeholder="John Doe" required>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="signup-email">Email Address</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="email" id="signup-email" placeholder="student@university.edu" required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="signup-password">Password</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="password" id="signup-password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-[#2563eb] text-white font-bold py-2.5 rounded-md hover:bg-blue-700 transition-colors">
+                    Sign Up
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-sm text-gray-600">
+                Already have an account?
+                <button onclick="toggleView()" class="text-[#2563eb] font-semibold hover:underline">Sign in
+                    here</button>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleView() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+
+            if (loginForm.classList.contains('block')) {
+                loginForm.classList.remove('block');
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                signupForm.classList.add('block');
+            } else {
+                signupForm.classList.remove('block');
+                signupForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                loginForm.classList.add('block');
+            }
+        }
+
+        function handleAuth(event) {
+            event.preventDefault();
+            localStorage.setItem('focusFlowAuth', 'true');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>
