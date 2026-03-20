@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        @keyframes grow {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .tree-animate {
+            animation: grow 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-[#f4f7f6] h-screen flex flex-col overflow-hidden font-sans">
+
+    <header
+        class="bg-gradient-to-r from-[#244b8a] to-[#3b82f6] text-white flex justify-between items-center px-6 py-4 shadow-md z-20">
+        <div class="flex items-center gap-5">
+            <button onclick="toggleSidebar()" class="focus:outline-none hover:text-gray-200 transition-colors">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <h1 class="text-2xl font-semibold tracking-wide">FocusFlow</h1>
+        </div>
+
+        <div id="authContainer">
+            <a id="loginBtn" href="loginpage.html"
+                class="bg-white text-[#244b8a] px-6 py-2 rounded font-bold shadow hover:bg-gray-100 transition-colors">
+                Sign Up / Sign In
+            </a>
+
+            <div id="userProfile" onclick="logout()"
+                class="hidden items-center gap-3 bg-white/10 px-4 py-2 rounded-lg cursor-pointer hover:bg-rose-500 hover:text-white transition-colors group"
+                title="Click to log out">
+                <div
+                    class="w-8 h-8 rounded-full bg-white text-[#244b8a] flex items-center justify-center font-bold text-sm group-hover:bg-white group-hover:text-rose-500 transition-colors">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="font-semibold tracking-wide group-hover:hidden">Ankit</span>
+                <span class="font-semibold tracking-wide hidden group-hover:inline">Log Out</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <aside id="sidebar"
+            class="w-20 bg-white flex flex-col py-6 border-r border-gray-200 shadow-sm z-10 overflow-y-auto transition-all duration-300 ease-in-out absolute md:relative h-full">
+            <nav class="flex flex-col w-full space-y-2">
+                <button onclick="navigate('home')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-home text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Home</span>
+                </button>
+                <button onclick="navigate('tracker')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-graduation-cap text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Attention
+                        Tracker</span>
+                </button>
+                <button onclick="navigate('data')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-university text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Recent Data</span>
+                </button>
+                <button onclick="navigate('history')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-book text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Data History</span>
+                </button>
+                <button onclick="navigate('forest')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-tree text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Focus Forest</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-8 overflow-y-auto w-full">
+
+            <section id="home" class="block max-w-5xl mx-auto animate-fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+
+                    <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-10 text-center border-b border-gray-100">
+                        <h2 class="text-4xl font-extrabold text-gray-900 mb-4">Master Your Focus</h2>
+                        <p class="text-lg text-gray-600 max-w-2xl mx-auto">FocusFlow provides real-time tracking of your
+                            attention and emotional states. Whether you are actively engaging in daily lectures,
+                            self-studying, or taking remote exams, FocusFlow helps you build better habits and maintain
+                            absolute concentration.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 p-10 border-b border-gray-100">
+                        <div class="text-center">
+                            <div
+                                class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#244b8a]">
+                                <i class="fas fa-camera text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 mb-2">Real-time Tracking</h3>
+                            <p class="text-gray-500 text-sm">Monitors head pose and eye gaze continuously to calculate
+                                your live Focus Score.</p>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#244b8a]">
+                                <i class="fas fa-chart-pie text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 mb-2">Emotion Analytics</h3>
+                            <p class="text-gray-500 text-sm">Understand how your expressions and mood impact your
+                                productivity over time.</p>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600">
+                                <i class="fas fa-tree text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 mb-2">Grow Your Forest</h3>
+                            <p class="text-gray-500 text-sm">Your attention level directly fuels your digital ecosystem.
+                                Earn trees after every session based on your focus score and build a thriving forest
+                                that visualizes your hard work.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-10 bg-gray-50">
+                        <h3 class="text-2xl font-bold text-center text-gray-800 mb-8">Built for Every Academic Need</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <i class="fas fa-book-reader text-2xl text-[#244b8a]"></i>
+                                    <h4 class="text-xl font-bold text-gray-800">Lectures & Study Sessions</h4>
+                                </div>
+                                <p class="text-gray-600 text-sm">Turn on the tracker during your daily studies to
+                                    measure your attention span. Identify when you start to lose focus so you can take
+                                    timed breaks and maximize your learning retention.</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <i class="fas fa-file-signature text-2xl text-rose-500"></i>
+                                    <h4 class="text-xl font-bold text-gray-800">Remote Examinations</h4>
+                                </div>
+                                <p class="text-gray-600 text-sm">Ensure academic integrity during tests. FocusFlow acts
+                                    as an exam-monitoring tool to track consistent screen presence and flag distracted
+                                    behavior during high-stakes assessments.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="tracker" class="hidden max-w-4xl mx-auto mt-8 w-full">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Attention Tracker</h2>
+
+                    <div id="recordingTimer"
+                        class="hidden text-rose-500 font-mono text-3xl font-bold mb-6 animate-pulse">00:00</div>
+
+                    <div
+                        class="bg-black w-full aspect-video rounded-xl overflow-hidden flex items-center justify-center relative mb-8 shadow-inner">
+                        <video id="webcam" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+                        <span id="camera-placeholder" class="text-gray-400 font-medium tracking-widest uppercase">Camera
+                            Access Required</span>
+                    </div>
+
+                    <div class="flex justify-center gap-6">
+                        <button id="startBtn" onclick="startRecording()"
+                            class="px-8 py-3 bg-emerald-500 text-white font-bold rounded-lg shadow transition-colors hover:bg-emerald-600">
+                            Start Recording
+                        </button>
+                        <button id="stopBtn" onclick="stopRecording()"
+                            class="px-8 py-3 bg-gray-400 text-white font-bold rounded-lg shadow cursor-not-allowed transition-colors"
+                            disabled>
+                            Stop Recording
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="data" class="hidden max-w-5xl mx-auto mt-8 w-full">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Your Recent Data</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Session Focus Trend</h3>
+                        <canvas id="lineChart"></canvas>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Emotion Distribution</h3>
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history" class="hidden max-w-5xl mx-auto text-center mt-20">
+                <h2 class="text-3xl font-bold text-gray-800">Session History</h2>
+                <p class="text-gray-500 mt-2">Past logs go here.</p>
+            </section>
+
+            <section id="forest" class="hidden max-w-5xl mx-auto mt-8 w-full">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Focus Forest</h2>
+                        <p class="text-gray-600">Plant trees based on your attention level. The higher your score, the
+                            more trees you earn!</p>
+                    </div>
+
+                    <div
+                        class="bg-emerald-50 p-6 rounded-xl border border-emerald-100 flex flex-col md:flex-row items-center justify-between mb-8 shadow-inner">
+                        <div class="mb-4 md:mb-0 text-center md:text-left">
+                            <p class="text-gray-700">Last Session Attention Score: <span id="sessionScoreDisplay"
+                                    class="font-bold text-2xl text-[#244b8a]">85%</span></p>
+                            <p class="text-gray-600 text-sm mt-1">You have earned <span id="pendingTreesDisplay"
+                                    class="font-bold text-emerald-600 text-lg">3</span> trees to plant.</p>
+                        </div>
+                        <button id="plantBtn" onclick="plantEarnedTrees()"
+                            class="px-6 py-3 bg-emerald-500 text-white font-bold rounded-lg shadow-md hover:bg-emerald-600 transition-colors flex items-center gap-2">
+                            <i class="fas fa-seedling"></i> Plant Now
+                        </button>
+                    </div>
+
+                    <div id="virtualForest"
+                        class="w-full min-h-[300px] bg-gradient-to-b from-blue-50 to-green-100 rounded-xl border border-gray-200 p-6 flex flex-wrap content-start gap-4">
+                        <i class="fas fa-tree text-5xl text-emerald-700"></i>
+                        <i class="fas fa-tree text-4xl text-emerald-600"></i>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="authAlert" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
+            <i class="fas fa-lock text-4xl text-[#244b8a] mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Access Denied</h3>
+            <p class="text-gray-600 mb-6">You must be logged in to access the FocusFlow dashboard features.</p>
+            <div class="flex justify-center gap-4">
+                <button onclick="closeAlert()"
+                    class="px-6 py-2 bg-gray-200 text-gray-800 rounded font-semibold hover:bg-gray-300 transition-colors">Close</button>
+                <a href="loginpage.html"
+                    class="px-6 py-2 bg-[#244b8a] text-white rounded font-semibold hover:bg-blue-800 transition-colors">Sign
+                    In Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isSidebarOpen = false;
+        let stream = null;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let chartsInitialized = false;
+        let unplantedTrees = 3;
+
+        let isLoggedIn = localStorage.getItem('focusFlowAuth') === 'true';
+
+        document.addEventListener('DOMContentLoaded', updateAuthDisplay);
+
+        function updateAuthDisplay() {
+            const loginBtn = document.getElementById('loginBtn');
+            const userProfile = document.getElementById('userProfile');
+
+            if (isLoggedIn) {
+                loginBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                userProfile.classList.add('flex');
+            } else {
+                loginBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+                userProfile.classList.remove('flex');
+
+                const activeSections = document.querySelectorAll('main > section.block');
+                if (activeSections.length > 0 && activeSections[0].id !== 'home') {
+                    navigate('home');
+                }
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('focusFlowAuth');
+            isLoggedIn = false;
+            updateAuthDisplay();
+            navigate('home');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const texts = document.querySelectorAll('.sidebar-text');
+
+            isSidebarOpen = !isSidebarOpen;
+
+            if (isSidebarOpen) {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                setTimeout(() => {
+                    texts.forEach(text => text.classList.remove('hidden'));
+                }, 150);
+            } else {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                texts.forEach(text => text.classList.add('hidden'));
+            }
+        }
+
+        function navigate(sectionId) {
+            if (!isLoggedIn && sectionId !== 'home') {
+                document.getElementById('authAlert').classList.remove('hidden');
+                return;
+            }
+
+            const sections = ['home', 'tracker', 'data', 'history', 'forest'];
+            sections.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('block');
+            });
+
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById(sectionId).classList.add('block');
+
+            if (sectionId === 'data' && !chartsInitialized) {
+                initializeCharts();
+                chartsInitialized = true;
+            }
+        }
+
+        function closeAlert() {
+            document.getElementById('authAlert').classList.add('hidden');
+        }
+
+        function updateTimerDisplay() {
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('recordingTimer').innerText = `${mins}:${secs}`;
+        }
+
+        async function startRecording() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const videoElement = document.getElementById('webcam');
+                const cameraPlaceholder = document.getElementById('camera-placeholder');
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const timerElement = document.getElementById('recordingTimer');
+
+                videoElement.srcObject = stream;
+                videoElement.classList.remove('hidden');
+                cameraPlaceholder.classList.add('hidden');
+
+                startBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                startBtn.classList.remove('hover:bg-emerald-600');
+                startBtn.disabled = true;
+                startBtn.classList.add('cursor-not-allowed');
+
+                stopBtn.classList.replace('bg-gray-400', 'bg-red-500');
+                stopBtn.classList.add('hover:bg-red-600');
+                stopBtn.disabled = false;
+                stopBtn.classList.remove('cursor-not-allowed');
+
+                secondsElapsed = 0;
+                updateTimerDisplay();
+                timerElement.classList.remove('hidden');
+                timerInterval = setInterval(() => {
+                    secondsElapsed++;
+                    updateTimerDisplay();
+                }, 1000);
+
+            } catch (err) {
+                alert("Camera access denied. Please allow permissions to use the tracker.");
+            }
+        }
+
+        function stopRecording() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                const videoElement = document.getElementById('webcam');
+                const cameraPlaceholder = document.getElementById('camera-placeholder');
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const timerElement = document.getElementById('recordingTimer');
+
+                videoElement.srcObject = null;
+                videoElement.classList.add('hidden');
+                cameraPlaceholder.classList.remove('hidden');
+
+                startBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
+                startBtn.classList.add('hover:bg-emerald-600');
+                startBtn.disabled = false;
+                startBtn.classList.remove('cursor-not-allowed');
+
+                stopBtn.classList.replace('bg-red-500', 'bg-gray-400');
+                stopBtn.classList.remove('hover:bg-red-600');
+                stopBtn.disabled = true;
+                stopBtn.classList.add('cursor-not-allowed');
+
+                clearInterval(timerInterval);
+                timerElement.classList.add('hidden');
+
+                unplantedTrees += 2;
+                document.getElementById('sessionScoreDisplay').innerText = '78%';
+                document.getElementById('pendingTreesDisplay').innerText = unplantedTrees;
+                const plantBtn = document.getElementById('plantBtn');
+                plantBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
+                plantBtn.classList.add('hover:bg-emerald-600');
+                plantBtn.disabled = false;
+                plantBtn.classList.remove('cursor-not-allowed');
+
+                navigate('data');
+            }
+        }
+
+        function plantEarnedTrees() {
+            if (unplantedTrees > 0) {
+                const forest = document.getElementById('virtualForest');
+
+                for (let i = 0; i < unplantedTrees; i++) {
+                    const treeIcon = document.createElement('i');
+
+                    const sizes = ['text-3xl', 'text-4xl', 'text-5xl', 'text-6xl'];
+                    const shades = ['text-emerald-500', 'text-emerald-600', 'text-emerald-700', 'text-green-600'];
+                    const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+                    const randomShade = shades[Math.floor(Math.random() * shades.length)];
+
+                    treeIcon.className = `fas fa-tree ${randomSize} ${randomShade} tree-animate`;
+
+                    forest.appendChild(treeIcon);
+                }
+
+                unplantedTrees = 0;
+                document.getElementById('pendingTreesDisplay').innerText = '0';
+                document.getElementById('sessionScoreDisplay').innerText = '0%';
+
+                const plantBtn = document.getElementById('plantBtn');
+                plantBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                plantBtn.classList.remove('hover:bg-emerald-600');
+                plantBtn.disabled = true;
+                plantBtn.classList.add('cursor-not-allowed');
+            }
+        }
+
+        function initializeCharts() {
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['0:00', '5:00', '10:00', '15:00', '20:00', '25:00'],
+                    datasets: [{
+                        label: 'Focus Score',
+                        data: [82, 90, 75, 60, 85, 95],
+                        borderColor: '#244b8a',
+                        backgroundColor: 'rgba(36, 75, 138, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Confusion/Distraction',
+                        data: [15, 5, 20, 35, 10, 5],
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'transparent',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+            new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Highly Focused', 'Confused', 'Sad', 'Distracted'],
+                    datasets: [{
+                        data: [60, 15, 5, 20],
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'right' } },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
