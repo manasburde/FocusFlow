@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,7 +51,7 @@
         </div>
 
         <div id="authContainer">
-            <a id="loginBtn" href="loginpage.html"
+            <a id="loginBtn" href="LoginPage.html"
                 class="bg-white text-[#244b8a] px-6 py-2 rounded font-bold shadow hover:bg-gray-100 transition-colors">
                 Sign Up / Sign In
             </a>
@@ -219,9 +218,55 @@
                 </div>
             </section>
 
-            <section id="history" class="hidden max-w-5xl mx-auto text-center mt-20">
-                <h2 class="text-3xl font-bold text-gray-800">Session History</h2>
-                <p class="text-gray-500 mt-2">Past logs go here.</p>
+            <section id="history" class="hidden max-w-5xl mx-auto mt-8 w-full">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800">Session History</h2>
+                        <select id="sessionDropdown" onchange="renderSessionDetails(this.value)"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                            <option value="">Loading Sessions...</option>
+                        </select>
+                    </div>
+
+                    <div id="sessionStats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 hidden">
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
+                            <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Final Focus
+                                Score</h3>
+                            <div id="histScore" class="text-4xl font-bold text-blue-600">--%</div>
+                        </div>
+                        <div class="bg-amber-50 p-6 rounded-xl border border-amber-100 text-center">
+                            <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Primary
+                                Emotion</h3>
+                            <div id="histEmotion" class="text-4xl font-bold text-amber-600">--</div>
+                        </div>
+                        <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100 text-center">
+                            <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Trees Earned
+                            </h3>
+                            <div id="histTrees" class="text-4xl font-bold text-emerald-600">--</div>
+                        </div>
+                    </div>
+
+                    <div id="sessionDetails" class="hidden">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Facial Cues Breakdown</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 border-b border-gray-100">
+                                        <th class="p-4 font-semibold text-gray-600">Time</th>
+                                        <th class="p-4 font-semibold text-gray-600">Focus Score</th>
+                                        <th class="p-4 font-semibold text-gray-600">Detected Emotion</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="noSessionMsg" class="text-center text-gray-500 py-8">
+                        Loading your past sessions...
+                    </div>
+                </div>
             </section>
 
             <section id="forest" class="hidden max-w-5xl mx-auto mt-8 w-full">
@@ -236,9 +281,9 @@
                         class="bg-emerald-50 p-6 rounded-xl border border-emerald-100 flex flex-col md:flex-row items-center justify-between mb-8 shadow-inner">
                         <div class="mb-4 md:mb-0 text-center md:text-left">
                             <p class="text-gray-700">Last Session Attention Score: <span id="sessionScoreDisplay"
-                                    class="font-bold text-2xl text-[#244b8a]">85%</span></p>
+                                    class="font-bold text-2xl text-[#244b8a]">0%</span></p>
                             <p class="text-gray-600 text-sm mt-1">You have earned <span id="pendingTreesDisplay"
-                                    class="font-bold text-emerald-600 text-lg">3</span> trees to plant.</p>
+                                    class="font-bold text-emerald-600 text-lg">0</span> trees to plant.</p>
                         </div>
                         <button id="plantBtn" onclick="plantEarnedTrees()"
                             class="px-6 py-3 bg-emerald-500 text-white font-bold rounded-lg shadow-md hover:bg-emerald-600 transition-colors flex items-center gap-2">
@@ -248,8 +293,6 @@
 
                     <div id="virtualForest"
                         class="w-full min-h-[300px] bg-gradient-to-b from-blue-50 to-green-100 rounded-xl border border-gray-200 p-6 flex flex-wrap content-start gap-4">
-                        <i class="fas fa-tree text-5xl text-emerald-700"></i>
-                        <i class="fas fa-tree text-4xl text-emerald-600"></i>
                     </div>
                 </div>
             </section>
@@ -265,7 +308,7 @@
             <div class="flex justify-center gap-4">
                 <button onclick="closeAlert()"
                     class="px-6 py-2 bg-gray-200 text-gray-800 rounded font-semibold hover:bg-gray-300 transition-colors">Close</button>
-                <a href="loginpage.html"
+                <a href="LoginPage.html"
                     class="px-6 py-2 bg-[#244b8a] text-white rounded font-semibold hover:bg-blue-800 transition-colors">Sign
                     In Now</a>
             </div>
@@ -273,16 +316,54 @@
     </div>
 
     <script>
+        // --- AWS API CONFIGURATION ---
+        // TODO: Replace with your actual API Gateway Invoke URL from the Setup Guide
+        const API_GATEWAY_URL = 'https://anmg4iekh2.execute-api.ap-south-1.amazonaws.com/prod/process-frame';
+
+        // AWS Cognito Variables for Logout
+        const COGNITO_DOMAIN = 'https://ap-south-164ne3nyvd.auth.ap-south-1.amazoncognito.com';
+        const COGNITO_CLIENT_ID = '2bu3mj8l8ntgtqbcl9tlenpj3a';
+        // -----------------------------
+
         let isSidebarOpen = false;
         let stream = null;
         let timerInterval = null;
+        let captureInterval = null;
         let secondsElapsed = 0;
-        let chartsInitialized = false;
-        let unplantedTrees = 3;
+        let unplantedTrees = 0;
+        let totalPlantedTrees = 0;
+        let lastSessionScore = 0;
+        let lineChartInstance = null;
+        let doughnutChartInstance = null;
+        let chartData = null;
+        let groupedSessions = []; // Global variable to hold grouped sessions
 
         let isLoggedIn = localStorage.getItem('focusFlowAuth') === 'true';
 
-        document.addEventListener('DOMContentLoaded', updateAuthDisplay);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for Google Sign-In redirect tokens in URL hash
+            const hash = window.location.hash.substring(1);
+            if (hash && hash.includes("id_token")) {
+                const params = new URLSearchParams(hash);
+                localStorage.setItem('focusFlowAuth', 'true');
+                localStorage.setItem('ff_token', params.get('id_token'));
+                // Decode JWT to get email/name
+                try {
+                    const base64Url = params.get('id_token').split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    const payload = JSON.parse(jsonPayload);
+                    localStorage.setItem('ff_user', payload.email || payload["cognito:username"] || "User");
+                } catch (e) {
+                    console.log(e);
+                }
+                isLoggedIn = true;
+                window.history.replaceState(null, null, 'index.html'); // clear hash
+            }
+            updateAuthDisplay();
+        });
 
         function updateAuthDisplay() {
             const loginBtn = document.getElementById('loginBtn');
@@ -292,6 +373,10 @@
                 loginBtn.classList.add('hidden');
                 userProfile.classList.remove('hidden');
                 userProfile.classList.add('flex');
+                // Set username
+                let userEmail = localStorage.getItem('ff_user') || 'User';
+                let shortName = userEmail.split('@')[0];
+                document.querySelector('#userProfile span.group-hover\\:hidden').innerText = shortName;
             } else {
                 loginBtn.classList.remove('hidden');
                 userProfile.classList.add('hidden');
@@ -306,9 +391,13 @@
 
         function logout() {
             localStorage.removeItem('focusFlowAuth');
+            localStorage.removeItem('ff_token');
+            localStorage.removeItem('ff_user');
             isLoggedIn = false;
-            updateAuthDisplay();
-            navigate('home');
+
+            // Redirect to proper AWS Cognito Hosted UI Logout Endpoint to wipe the tracking cookie
+            const logoutUri = encodeURIComponent(window.location.origin + '/LoginPage.html');
+            window.location.href = `${COGNITO_DOMAIN}/logout?client_id=${COGNITO_CLIENT_ID}&logout_uri=${logoutUri}`;
         }
 
         function toggleSidebar() {
@@ -345,9 +434,12 @@
             document.getElementById(sectionId).classList.remove('hidden');
             document.getElementById(sectionId).classList.add('block');
 
-            if (sectionId === 'data' && !chartsInitialized) {
-                initializeCharts();
-                chartsInitialized = true;
+            if (sectionId === 'data') {
+                initializeCharts(); // Always refresh charts on entering view
+            } else if (sectionId === 'history') {
+                loadHistoryTable(); // Fetch completely new list of all sessions
+            } else if (sectionId === 'forest') {
+                syncForest(); // Recalculate trees dynamically
             }
         }
 
@@ -387,10 +479,17 @@
                 secondsElapsed = 0;
                 updateTimerDisplay();
                 timerElement.classList.remove('hidden');
+
                 timerInterval = setInterval(() => {
                     secondsElapsed++;
                     updateTimerDisplay();
                 }, 1000);
+
+                // Setup AWS capture interval (10 seconds for testing)
+                captureInterval = setInterval(captureFrameAndSend, 10000);
+
+                // Trigger first capture immediately
+                setTimeout(captureFrameAndSend, 2000); // 2 second delay to let camera focus
 
             } catch (err) {
                 alert("Camera access denied. Please allow permissions to use the tracker.");
@@ -421,18 +520,69 @@
                 stopBtn.classList.add('cursor-not-allowed');
 
                 clearInterval(timerInterval);
+                clearInterval(captureInterval);
                 timerElement.classList.add('hidden');
 
-                unplantedTrees += 2;
-                document.getElementById('sessionScoreDisplay').innerText = '78%';
-                document.getElementById('pendingTreesDisplay').innerText = unplantedTrees;
-                const plantBtn = document.getElementById('plantBtn');
-                plantBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
-                plantBtn.classList.add('hover:bg-emerald-600');
-                plantBtn.disabled = false;
-                plantBtn.classList.remove('cursor-not-allowed');
+                let earnedTrees = 0;
+                if (lastSessionScore >= 80) earnedTrees = 3;
+                else if (lastSessionScore >= 50) earnedTrees = 2;
+                else if (lastSessionScore > 0) earnedTrees = 1;
 
-                navigate('data');
+                unplantedTrees += earnedTrees;
+
+                const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+                localStorage.setItem('ff_unplanted_' + userId, unplantedTrees);
+
+                document.getElementById('sessionScoreDisplay').innerText = lastSessionScore + '%';
+                document.getElementById('pendingTreesDisplay').innerText = unplantedTrees;
+
+                const plantBtn = document.getElementById('plantBtn');
+                if (unplantedTrees > 0) {
+                    plantBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
+                    plantBtn.classList.add('hover:bg-emerald-600');
+                    plantBtn.disabled = false;
+                    plantBtn.classList.remove('cursor-not-allowed');
+                } else {
+                    plantBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                    plantBtn.classList.remove('hover:bg-emerald-600');
+                    plantBtn.disabled = true;
+                    plantBtn.classList.add('cursor-not-allowed');
+                }
+
+                navigate('data'); // Triggers charts data fetch
+            }
+        }
+
+        async function captureFrameAndSend() {
+            const video = document.getElementById('webcam');
+            if (!video || video.classList.contains('hidden')) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'process',
+                        userId: userId,
+                        image: base64Image
+                    })
+                });
+                const result = await response.json();
+                console.log("Processed Frame Result:", result);
+                if (result.success && result.score !== undefined) {
+                    lastSessionScore = result.score;
+                }
+            } catch (e) {
+                console.error("Error sending frame to backend:", e);
             }
         }
 
@@ -454,6 +604,9 @@
                 }
 
                 unplantedTrees = 0;
+                const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+                localStorage.setItem('ff_unplanted_' + userId, unplantedTrees);
+
                 document.getElementById('pendingTreesDisplay').innerText = '0';
                 document.getElementById('sessionScoreDisplay').innerText = '0%';
 
@@ -465,25 +618,288 @@
             }
         }
 
-        function initializeCharts() {
+        async function syncForest() {
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+            const forest = document.getElementById('virtualForest');
+            const pDisplay = document.getElementById('pendingTreesDisplay');
+            const plantBtn = document.getElementById('plantBtn');
+
+            forest.innerHTML = '<p class="text-gray-500 italic w-full text-center py-4">Loading forest data...</p>';
+
+            unplantedTrees = parseInt(localStorage.getItem('ff_unplanted_' + userId) || '0');
+            pDisplay.innerText = unplantedTrees;
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'history', userId: userId })
+                });
+                const result = await response.json();
+
+                let totalLifetimeTrees = 0;
+                if (result.data && result.data.length > 0) {
+                    const sortedData = result.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    let currentSession = [];
+                    let sessions = [];
+
+                    for (let i = 0; i < sortedData.length; i++) {
+                        if (currentSession.length === 0) { currentSession.push(sortedData[i]); }
+                        else {
+                            const lastTime = new Date(currentSession[currentSession.length - 1].timestamp).getTime();
+                            const currTime = new Date(sortedData[i].timestamp).getTime();
+                            if (currTime - lastTime > 5 * 60 * 1000) {
+                                sessions.push(currentSession);
+                                currentSession = [sortedData[i]];
+                            } else {
+                                currentSession.push(sortedData[i]);
+                            }
+                        }
+                    }
+                    if (currentSession.length > 0) sessions.push(currentSession);
+
+                    sessions.forEach(session => {
+                        let scoreSum = 0;
+                        session.forEach(i => scoreSum += i.score);
+                        let avgScore = scoreSum / session.length;
+                        if (avgScore >= 80) totalLifetimeTrees += 3;
+                        else if (avgScore >= 50) totalLifetimeTrees += 2;
+                        else if (avgScore > 0) totalLifetimeTrees += 1;
+                    });
+                }
+
+                totalPlantedTrees = totalLifetimeTrees - unplantedTrees;
+                if (totalPlantedTrees < 0) totalPlantedTrees = 0;
+
+                forest.innerHTML = '';
+                if (totalPlantedTrees === 0) {
+                    forest.innerHTML = '<p class="text-gray-400 italic w-full text-center py-10">No trees planted yet. Complete a session to start growing your forest!</p>';
+                } else {
+                    for (let i = 0; i < totalPlantedTrees; i++) {
+                        const treeIcon = document.createElement('i');
+                        const sizes = ['text-3xl', 'text-4xl', 'text-5xl', 'text-6xl'];
+                        const shades = ['text-emerald-500', 'text-emerald-600', 'text-emerald-700', 'text-green-600'];
+                        treeIcon.className = `fas fa-tree ${sizes[i % sizes.length]} ${shades[i % shades.length]}`;
+                        forest.appendChild(treeIcon);
+                    }
+                }
+
+            } catch (e) {
+                console.error("Forest history sync failed:", e);
+                forest.innerHTML = '<p class="text-rose-500 text-center w-full py-4">Failed to load trees from AWS</p>';
+            }
+
+            if (unplantedTrees > 0) {
+                plantBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
+                plantBtn.classList.add('hover:bg-emerald-600');
+                plantBtn.disabled = false;
+                plantBtn.classList.remove('cursor-not-allowed');
+            } else {
+                plantBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                plantBtn.classList.remove('hover:bg-emerald-600');
+                plantBtn.disabled = true;
+                plantBtn.classList.add('cursor-not-allowed');
+            }
+        }
+
+        async function loadHistoryTable() {
+            document.getElementById('noSessionMsg').classList.remove('hidden');
+            document.getElementById('noSessionMsg').innerText = "Loading your past sessions...";
+            document.getElementById('sessionStats').classList.add('hidden');
+            document.getElementById('sessionDetails').classList.add('hidden');
+            document.getElementById('sessionDropdown').innerHTML = '<option value="">Select a Session</option>';
+
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'history', userId: userId })
+                });
+                const result = await response.json();
+
+                if (result.data && result.data.length > 0) {
+                    const sortedData = result.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    groupedSessions = [];
+                    let currentSession = [];
+
+                    for (let i = 0; i < sortedData.length; i++) {
+                        if (currentSession.length === 0) {
+                            currentSession.push(sortedData[i]);
+                        } else {
+                            const lastTime = new Date(currentSession[currentSession.length - 1].timestamp).getTime();
+                            const currTime = new Date(sortedData[i].timestamp).getTime();
+                            // If gap is more than 5 minutes, treat it as a new session
+                            if (currTime - lastTime > 5 * 60 * 1000) {
+                                groupedSessions.push(currentSession);
+                                currentSession = [sortedData[i]];
+                            } else {
+                                currentSession.push(sortedData[i]);
+                            }
+                        }
+                    }
+                    if (currentSession.length > 0) groupedSessions.push(currentSession);
+
+                    if (groupedSessions.length > 0) {
+                        document.getElementById('noSessionMsg').classList.add('hidden');
+                        const dropdown = document.getElementById('sessionDropdown');
+                        let html = '';
+                        groupedSessions.forEach((session, idx) => {
+                            const date = new Date(session[0].timestamp).toLocaleDateString();
+                            html += `<option value="${idx}">Session ${idx + 1} (${date})</option>`;
+                        });
+                        dropdown.innerHTML = html;
+
+                        // Select the most recent session by default
+                        dropdown.value = groupedSessions.length - 1;
+                        renderSessionDetails(groupedSessions.length - 1);
+                    }
+                } else {
+                    document.getElementById('noSessionMsg').innerText = "No session history yet. Start a tracking session!";
+                }
+            } catch (e) {
+                console.error("Failed to load history table:", e);
+                document.getElementById('noSessionMsg').innerText = "Failed to load history from AWS.";
+            }
+        }
+
+        function renderSessionDetails(sessionIndex) {
+            if (sessionIndex === "" || !groupedSessions[sessionIndex]) return;
+
+            document.getElementById('noSessionMsg').classList.add('hidden');
+            const session = groupedSessions[sessionIndex];
+
+            // Calculate aggregate stats
+            let totalScore = 0;
+            let emotionCounts = {};
+            session.forEach(item => {
+                totalScore += item.score;
+                emotionCounts[item.emotion] = (emotionCounts[item.emotion] || 0) + 1;
+            });
+            const avgScore = Math.round(totalScore / session.length);
+
+            // Find most frequent primary emotion
+            let primaryEmotion = 'UNKNOWN';
+            let maxCount = 0;
+            for (let em in emotionCounts) {
+                if (emotionCounts[em] > maxCount) { maxCount = emotionCounts[em]; primaryEmotion = em; }
+            }
+
+            // Calculate trees
+            let treesToPlant = 0;
+            if (avgScore >= 80) treesToPlant = 3;
+            else if (avgScore >= 50) treesToPlant = 2;
+            else if (avgScore > 0) treesToPlant = 1;
+
+            // Update UI
+            document.getElementById('histScore').innerText = `${avgScore}%`;
+            document.getElementById('histEmotion').innerText = primaryEmotion;
+            document.getElementById('histTrees').innerText = treesToPlant;
+
+            // Build Table
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            session.forEach(item => {
+                const date = new Date(item.timestamp);
+                const isGoodFocus = item.score > 70;
+                const row = `
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td class="p-4 text-gray-600">${date.toLocaleTimeString()}</td>
+                        <td class="p-4 font-bold ${isGoodFocus ? 'text-emerald-500' : 'text-rose-500'}">${item.score}%</td>
+                        <td class="p-4 text-gray-600">${item.emotion}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            document.getElementById('sessionStats').classList.remove('hidden');
+            document.getElementById('sessionDetails').classList.remove('hidden');
+        }
+
+        async function initializeCharts() {
+            // First fetch real data from AWS API Gateway
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+            let chartLabels = [];
+            let focusData = [];
+            let emotionCounts = {
+                'Highly Focused': 0,
+                'Confused': 0,
+                'Sad': 0,
+                'Distracted': 0
+            };
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'history', userId: userId })
+                });
+                const result = await response.json();
+
+                if (result.data && result.data.length > 0) {
+                    const sortedData = result.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    let currentSession = [];
+                    let sessions = [];
+
+                    for (let i = 0; i < sortedData.length; i++) {
+                        if (currentSession.length === 0) {
+                            currentSession.push(sortedData[i]);
+                        } else {
+                            const lastTime = new Date(currentSession[currentSession.length - 1].timestamp).getTime();
+                            const currTime = new Date(sortedData[i].timestamp).getTime();
+                            if (currTime - lastTime > 5 * 60 * 1000) {
+                                sessions.push(currentSession);
+                                currentSession = [sortedData[i]];
+                            } else {
+                                currentSession.push(sortedData[i]);
+                            }
+                        }
+                    }
+                    if (currentSession.length > 0) sessions.push(currentSession);
+
+                    const latestSession = sessions[sessions.length - 1]; // Only get the real latest session
+
+                    chartLabels = latestSession.map(item => {
+                        const date = new Date(item.timestamp);
+                        // Using HH:MM:SS for the chart labels
+                        return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+                    });
+                    focusData = latestSession.map(item => item.score);
+
+                    emotionCounts = { 'Highly Focused': 0, 'Confused': 0, 'Sad': 0, 'Distracted': 0 };
+                    latestSession.forEach(item => {
+                        if (item.emotion === 'CALM' || item.emotion === 'HAPPY') emotionCounts['Highly Focused']++;
+                        else if (item.emotion === 'CONFUSED') emotionCounts['Confused']++;
+                        else if (item.emotion === 'SAD' || item.emotion === 'ANGRY') emotionCounts['Sad']++;
+                        else emotionCounts['Distracted']++;
+                    });
+
+                    // Prevent division by zero pie chart issues
+                    if (Object.values(emotionCounts).reduce((a, b) => a + b, 0) === 0) {
+                        emotionCounts['Highly Focused'] = 1;
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch history, falling back to dummy data", e);
+            }
+
+            // Destroy existing charts to explicitly re-draw fresh data without caching issues
+            if (lineChartInstance) lineChartInstance.destroy();
+            if (doughnutChartInstance) doughnutChartInstance.destroy();
+
             const ctxLine = document.getElementById('lineChart').getContext('2d');
-            new Chart(ctxLine, {
+            lineChartInstance = new Chart(ctxLine, {
                 type: 'line',
                 data: {
-                    labels: ['0:00', '5:00', '10:00', '15:00', '20:00', '25:00'],
+                    labels: chartLabels,
                     datasets: [{
                         label: 'Focus Score',
-                        data: [82, 90, 75, 60, 85, 95],
+                        data: focusData,
                         borderColor: '#244b8a',
                         backgroundColor: 'rgba(36, 75, 138, 0.1)',
                         tension: 0.4,
                         fill: true
-                    }, {
-                        label: 'Confusion/Distraction',
-                        data: [15, 5, 20, 35, 10, 5],
-                        borderColor: '#f43f5e',
-                        backgroundColor: 'transparent',
-                        tension: 0.4
                     }]
                 },
                 options: {
@@ -493,12 +909,17 @@
             });
 
             const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
-            new Chart(ctxDoughnut, {
+            doughnutChartInstance = new Chart(ctxDoughnut, {
                 type: 'doughnut',
                 data: {
                     labels: ['Highly Focused', 'Confused', 'Sad', 'Distracted'],
                     datasets: [{
-                        data: [60, 15, 5, 20],
+                        data: [
+                            emotionCounts['Highly Focused'],
+                            emotionCounts['Confused'],
+                            emotionCounts['Sad'],
+                            emotionCounts['Distracted']
+                        ],
                         backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'],
                         borderWidth: 0
                     }]
