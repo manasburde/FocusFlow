@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -246,20 +247,48 @@
                         </div>
                     </div>
 
-                    <div id="sessionDetails" class="hidden">
-                        <h3 class="text-xl font-bold text-gray-800 mb-4">Facial Cues Breakdown</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-50 border-b border-gray-100">
-                                        <th class="p-4 font-semibold text-gray-600">Time</th>
-                                        <th class="p-4 font-semibold text-gray-600">Focus Score</th>
-                                        <th class="p-4 font-semibold text-gray-600">Detected Emotion</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="historyTableBody">
-                                </tbody>
-                            </table>
+                    <div id="sessionDetails" class="hidden flex-col gap-6">
+                        <div id="sessionMessage"
+                            class="hidden p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Session Focus Trend</h3>
+                                <canvas id="sessionLineChart"></canvas>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Emotion Distribution</h3>
+                                <canvas id="sessionDoughnutChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-col items-center">
+                            <button id="toggleAdvancedBtn" onclick="toggleAdvancedAnalysis()"
+                                class="px-6 py-2 bg-white text-[#244b8a] rounded-full font-bold shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors flex items-center gap-2">
+                                <i class="fas fa-table"></i> View Advanced Analysis
+                            </button>
+                        </div>
+
+                        <div id="advancedAnalysisTable"
+                            class="hidden mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+                            <div
+                                class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="font-bold text-gray-800"><i
+                                        class="fas fa-list-ul mr-2 text-[#244b8a]"></i>Detailed Timeline</h3>
+                            </div>
+                            <div class="max-h-96 overflow-y-auto w-full">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="sticky top-0 bg-white shadow-sm z-10">
+                                        <tr class="text-xs uppercase tracking-wider text-gray-500 bg-gray-50">
+                                            <th class="p-4 font-semibold">Time</th>
+                                            <th class="p-4 font-semibold">Focus Score</th>
+                                            <th class="p-4 font-semibold">Detected Emotion</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTableBody" class="text-sm divide-y divide-gray-100">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -335,6 +364,8 @@
         let lastSessionScore = 0;
         let lineChartInstance = null;
         let doughnutChartInstance = null;
+        let sessionLineChartInstance = null;
+        let sessionPieChartInstance = null;
         let chartData = null;
         let groupedSessions = []; // Global variable to hold grouped sessions
 
@@ -523,15 +554,13 @@
                 clearInterval(captureInterval);
                 timerElement.classList.add('hidden');
 
-                let earnedTrees = 0;
-                if (lastSessionScore >= 80) earnedTrees = 3;
-                else if (lastSessionScore >= 50) earnedTrees = 2;
-                else if (lastSessionScore > 0) earnedTrees = 1;
-
-                unplantedTrees += earnedTrees;
-
                 const userId = localStorage.getItem('ff_user') || 'anonymous_user';
-                localStorage.setItem('ff_unplanted_' + userId, unplantedTrees);
+                let scoresStr = localStorage.getItem('ff_unplanted_scores_' + userId) || '[]';
+                let scores = JSON.parse(scoresStr);
+                scores.push(lastSessionScore);
+                localStorage.setItem('ff_unplanted_scores_' + userId, JSON.stringify(scores));
+
+                unplantedTrees = scores.length;
 
                 document.getElementById('sessionScoreDisplay').innerText = lastSessionScore + '%';
                 document.getElementById('pendingTreesDisplay').innerText = unplantedTrees;
@@ -586,26 +615,47 @@
             }
         }
 
+        function getTreeDOMElement(score, animate = false) {
+            const treeIcon = document.createElement('i');
+            let classes = ['fas'];
+
+            if (score >= 90) {
+                // Mythical/Golden Tree
+                classes.push('fa-tree', 'text-6xl', 'text-yellow-400', 'drop-shadow-[0_0_15px_rgba(250,204,21,0.8)]');
+            } else if (score >= 70) {
+                // Majestic Oak
+                classes.push('fa-tree', 'text-5xl', 'text-emerald-600', 'drop-shadow-md');
+            } else if (score >= 40) {
+                // Standard Pine
+                classes.push('fa-tree', 'text-4xl', 'text-emerald-500');
+            } else {
+                // Struggling Seedling
+                classes.push('fa-seedling', 'text-3xl', 'text-amber-700');
+            }
+
+            treeIcon.className = classes.join(' ');
+            if (animate) treeIcon.classList.add('tree-animate');
+            return treeIcon;
+        }
+
         function plantEarnedTrees() {
             if (unplantedTrees > 0) {
                 const forest = document.getElementById('virtualForest');
+                const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+                let scoresStr = localStorage.getItem('ff_unplanted_scores_' + userId) || '[]';
+                let scores = JSON.parse(scoresStr);
 
-                for (let i = 0; i < unplantedTrees; i++) {
-                    const treeIcon = document.createElement('i');
-
-                    const sizes = ['text-3xl', 'text-4xl', 'text-5xl', 'text-6xl'];
-                    const shades = ['text-emerald-500', 'text-emerald-600', 'text-emerald-700', 'text-green-600'];
-                    const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
-                    const randomShade = shades[Math.floor(Math.random() * shades.length)];
-
-                    treeIcon.className = `fas fa-tree ${randomSize} ${randomShade} tree-animate`;
-
-                    forest.appendChild(treeIcon);
+                // Ensure the empty state message is removed before adding trees
+                if (forest.querySelector('p')) {
+                    forest.innerHTML = '';
                 }
 
+                scores.forEach(score => {
+                    forest.appendChild(getTreeDOMElement(score, true));
+                });
+
                 unplantedTrees = 0;
-                const userId = localStorage.getItem('ff_user') || 'anonymous_user';
-                localStorage.setItem('ff_unplanted_' + userId, unplantedTrees);
+                localStorage.setItem('ff_unplanted_scores_' + userId, '[]');
 
                 document.getElementById('pendingTreesDisplay').innerText = '0';
                 document.getElementById('sessionScoreDisplay').innerText = '0%';
@@ -626,7 +676,9 @@
 
             forest.innerHTML = '<p class="text-gray-500 italic w-full text-center py-4">Loading forest data...</p>';
 
-            unplantedTrees = parseInt(localStorage.getItem('ff_unplanted_' + userId) || '0');
+            let scoresStr = localStorage.getItem('ff_unplanted_scores_' + userId) || '[]';
+            let unplantedScores = JSON.parse(scoresStr);
+            unplantedTrees = unplantedScores.length;
             pDisplay.innerText = unplantedTrees;
 
             try {
@@ -638,6 +690,8 @@
                 const result = await response.json();
 
                 let totalLifetimeTrees = 0;
+                let sessionScores = [];
+
                 if (result.data && result.data.length > 0) {
                     const sortedData = result.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
                     let currentSession = [];
@@ -662,10 +716,9 @@
                         let scoreSum = 0;
                         session.forEach(i => scoreSum += i.score);
                         let avgScore = scoreSum / session.length;
-                        if (avgScore >= 80) totalLifetimeTrees += 3;
-                        else if (avgScore >= 50) totalLifetimeTrees += 2;
-                        else if (avgScore > 0) totalLifetimeTrees += 1;
+                        sessionScores.push(avgScore);
                     });
+                    totalLifetimeTrees = sessionScores.length;
                 }
 
                 totalPlantedTrees = totalLifetimeTrees - unplantedTrees;
@@ -676,11 +729,7 @@
                     forest.innerHTML = '<p class="text-gray-400 italic w-full text-center py-10">No trees planted yet. Complete a session to start growing your forest!</p>';
                 } else {
                     for (let i = 0; i < totalPlantedTrees; i++) {
-                        const treeIcon = document.createElement('i');
-                        const sizes = ['text-3xl', 'text-4xl', 'text-5xl', 'text-6xl'];
-                        const shades = ['text-emerald-500', 'text-emerald-600', 'text-emerald-700', 'text-green-600'];
-                        treeIcon.className = `fas fa-tree ${sizes[i % sizes.length]} ${shades[i % shades.length]}`;
-                        forest.appendChild(treeIcon);
+                        forest.appendChild(getTreeDOMElement(sessionScores[i], false));
                     }
                 }
 
@@ -787,34 +836,113 @@
             }
 
             // Calculate trees
-            let treesToPlant = 0;
-            if (avgScore >= 80) treesToPlant = 3;
-            else if (avgScore >= 50) treesToPlant = 2;
-            else if (avgScore > 0) treesToPlant = 1;
+            let treesToPlant = 1;
 
             // Update UI
             document.getElementById('histScore').innerText = `${avgScore}%`;
             document.getElementById('histEmotion').innerText = primaryEmotion;
             document.getElementById('histTrees').innerText = treesToPlant;
 
-            // Build Table
+            const msgDiv = document.getElementById('sessionMessage');
+            msgDiv.classList.remove('hidden');
+            if (avgScore >= 70) {
+                msgDiv.className = 'p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4 bg-emerald-50 text-emerald-800 border-emerald-200';
+                const quotes = [
+                    "Fantastic focus! Keep up the great work.",
+                    "You're building an incredible attention span.",
+                    "Success is the sum of small efforts, repeated day in and day out!"
+                ];
+                msgDiv.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+            } else if (avgScore >= 40) {
+                msgDiv.className = 'p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4 bg-amber-50 text-amber-800 border-amber-200';
+                msgDiv.innerText = "Good effort, but there's room for improvement. Try eliminating external distractions.";
+            } else {
+                msgDiv.className = 'p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4 bg-rose-50 text-rose-800 border-rose-200';
+                msgDiv.innerText = "Your focus struggled this session. Consider taking a short break and returning refreshed!";
+            }
+
+            let chartLabels = [];
+            let focusData = [];
+            let chartEmotionCounts = { 'Highly Focused': 0, 'Confused': 0, 'Sad': 0, 'Distracted': 0 };
+
+            session.forEach(item => {
+                const date = new Date(item.timestamp);
+                chartLabels.push(`${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`);
+                focusData.push(item.score);
+
+                if (item.emotion === 'CALM' || item.emotion === 'HAPPY') chartEmotionCounts['Highly Focused']++;
+                else if (item.emotion === 'CONFUSED') chartEmotionCounts['Confused']++;
+                else if (item.emotion === 'SAD' || item.emotion === 'ANGRY') chartEmotionCounts['Sad']++;
+                else chartEmotionCounts['Distracted']++;
+            });
+
+            if (Object.values(chartEmotionCounts).reduce((a, b) => a + b, 0) === 0) chartEmotionCounts['Highly Focused'] = 1;
+
+            if (sessionLineChartInstance) sessionLineChartInstance.destroy();
+            if (sessionPieChartInstance) sessionPieChartInstance.destroy();
+
+            sessionLineChartInstance = new Chart(document.getElementById('sessionLineChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Focus Score', data: focusData,
+                        borderColor: '#244b8a', backgroundColor: 'rgba(36, 75, 138, 0.1)', tension: 0.4, fill: true
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            sessionPieChartInstance = new Chart(document.getElementById('sessionDoughnutChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Highly Focused', 'Confused', 'Sad', 'Distracted'],
+                    datasets: [{
+                        data: [chartEmotionCounts['Highly Focused'], chartEmotionCounts['Confused'], chartEmotionCounts['Sad'], chartEmotionCounts['Distracted']],
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'], borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'right' } }, cutout: '70%' }
+            });
+
+            // Build Advanced Analysis Table
             const tbody = document.getElementById('historyTableBody');
             tbody.innerHTML = '';
             session.forEach(item => {
                 const date = new Date(item.timestamp);
                 const isGoodFocus = item.score > 70;
+
+                let emotionBadgeClass = 'bg-gray-100 text-gray-800';
+                if (item.emotion === 'HAPPY' || item.emotion === 'CALM') emotionBadgeClass = 'bg-emerald-100 text-emerald-800';
+                else if (item.emotion === 'CONFUSED') emotionBadgeClass = 'bg-amber-100 text-amber-800';
+                else if (item.emotion === 'SAD' || item.emotion === 'ANGRY') emotionBadgeClass = 'bg-rose-100 text-rose-800';
+                else if (item.emotion === 'SURPRISED') emotionBadgeClass = 'bg-purple-100 text-purple-800';
+
                 const row = `
-                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td class="p-4 text-gray-600">${date.toLocaleTimeString()}</td>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 text-gray-600 font-medium">${date.toLocaleTimeString()}</td>
                         <td class="p-4 font-bold ${isGoodFocus ? 'text-emerald-500' : 'text-rose-500'}">${item.score}%</td>
-                        <td class="p-4 text-gray-600">${item.emotion}</td>
+                        <td class="p-4"><span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${emotionBadgeClass}">${item.emotion}</span></td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
             });
 
+            // Ensure table is hidden when a new session is clicked
+            document.getElementById('advancedAnalysisTable').classList.add('hidden');
+
             document.getElementById('sessionStats').classList.remove('hidden');
             document.getElementById('sessionDetails').classList.remove('hidden');
+            document.getElementById('sessionDetails').classList.add('flex');
+        }
+
+        function toggleAdvancedAnalysis() {
+            const tableContainer = document.getElementById('advancedAnalysisTable');
+            if (tableContainer.classList.contains('hidden')) {
+                tableContainer.classList.remove('hidden');
+            } else {
+                tableContainer.classList.add('hidden');
+            }
         }
 
         async function initializeCharts() {
