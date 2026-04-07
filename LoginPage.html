@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Amazon Cognito SDK -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.3/dist/amazon-cognito-identity.min.js"></script>
+</head>
+
+<body class="bg-[#f3f4f6] h-screen flex items-center justify-center font-sans">
+
+    <div class="bg-white p-10 rounded-xl shadow-sm border border-gray-100 w-full max-w-[440px]">
+
+        <div id="loginForm" class="block">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-[#2563eb] mb-2 tracking-tight">FocusFlow</h1>
+                <p class="text-gray-500">Sign in to your account</p>
+            </div>
+
+            <form onsubmit="handleAuth(event)">
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="email">Email Address</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="email" id="email" placeholder="student@university.edu" required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="password">Password</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-[#2563eb] text-white font-bold py-2.5 rounded-md hover:bg-blue-700 transition-colors">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-8 flex items-center justify-between">
+                <span class="border-b w-1/5 lg:w-1/4 border-gray-200"></span>
+                <span class="text-xs text-center text-gray-500 uppercase font-medium tracking-wide">Or continue
+                    with</span>
+                <span class="border-b w-1/5 lg:w-1/4 border-gray-200"></span>
+            </div>
+
+            <button
+                class="w-full mt-6 bg-white border border-gray-300 text-gray-700 font-medium py-2.5 rounded-md hover:bg-gray-50 transition-colors flex items-center justify-center gap-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M22.56 12.25C22.56 11.47 22.49 10.74 22.36 10.04H12V14.24H17.92C17.67 15.6 16.89 16.74 15.74 17.51V20.24H19.3C21.38 18.32 22.56 15.54 22.56 12.25Z"
+                        fill="#4285F4" />
+                    <path
+                        d="M12 23C14.97 23 17.46 22.02 19.3 20.24L15.74 17.51C14.75 18.17 13.48 18.57 12 18.57C9.13 18.57 6.69 16.63 5.8 14.04H2.12V16.89C3.96 20.55 7.68 23 12 23Z"
+                        fill="#34A853" />
+                    <path
+                        d="M5.8 14.04C5.57 13.36 5.44 12.64 5.44 11.88C5.44 11.12 5.57 10.4 5.8 9.72V6.87H2.12C1.35 8.41 0.92 10.09 0.92 11.88C0.92 13.67 1.35 15.35 2.12 16.89L5.8 14.04Z"
+                        fill="#FBBC05" />
+                    <path
+                        d="M12 5.19C13.62 5.19 15.07 5.74 16.21 6.83L19.37 3.67C17.46 1.88 14.97 0.75 12 0.75C7.68 0.75 3.96 3.2 2.12 6.87L5.8 9.72C6.69 7.13 9.13 5.19 12 5.19Z"
+                        fill="#EA4335" />
+                </svg>
+                Sign in with Google
+            </button>
+
+            <p class="mt-8 text-center text-sm text-gray-600">
+                Don't have an account?
+                <button onclick="toggleView('signup')" class="text-[#2563eb] font-semibold hover:underline">Sign up
+                    here</button>
+            </p>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                <button onclick="toggleView('forgot')" class="text-[#2563eb] font-semibold hover:underline">Forgot
+                    Password?</button>
+            </p>
+        </div>
+
+        <div id="signupForm" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-[#2563eb] mb-2 tracking-tight">FocusFlow</h1>
+                <p class="text-gray-500">Create your account</p>
+            </div>
+
+            <form onsubmit="handleSignUp(event)">
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="signup-name">Full Name</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="text" id="signup-name" placeholder="John Doe" required>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="signup-email">Email Address</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="email" id="signup-email" placeholder="student@university.edu" required>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="signup-password">Password</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="password" id="signup-password" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-[#2563eb] text-white font-bold py-2.5 rounded-md hover:bg-blue-700 transition-colors">
+                    Sign Up
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-sm text-gray-600">
+                Already have an account?
+                <button onclick="toggleView('login')" class="text-[#2563eb] font-semibold hover:underline">Sign in
+                    here</button>
+            </p>
+        </div>
+
+        <div id="confirmForm" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-[#2563eb] mb-2 tracking-tight">Verify Email</h1>
+                <p class="text-gray-500">Enter the code sent to your email</p>
+            </div>
+
+            <form onsubmit="handleConfirm(event)">
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="confirm-code">Verification
+                        Code</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="text" id="confirm-code" placeholder="123456" required>
+                </div>
+                <button type="submit"
+                    class="w-full bg-[#2563eb] text-white font-bold py-2.5 rounded-md hover:bg-blue-700 transition-colors">
+                    Verify Account
+                </button>
+            </form>
+            <p class="mt-8 text-center text-sm text-gray-600">
+                <button onclick="toggleView('login')" class="text-[#2563eb] font-semibold hover:underline">Back to Sign
+                    In</button>
+            </p>
+        </div>
+
+        <div id="forgotPasswordForm" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-[#2563eb] mb-2 tracking-tight">Reset Password</h1>
+                <p class="text-gray-500">Enter email to receive reset code</p>
+            </div>
+
+            <form id="forgotReqForm" onsubmit="handleForgotPassword(event)" class="block">
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="forgot-email">Email Address</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="email" id="forgot-email" placeholder="student@university.edu" required>
+                </div>
+                <button type="submit"
+                    class="w-full bg-[#2563eb] text-white font-bold py-2.5 rounded-md hover:bg-blue-700 transition-colors">
+                    Send Code
+                </button>
+            </form>
+
+            <form id="forgotSubmitForm" onsubmit="handleConfirmPassword(event)" class="hidden">
+                <div class="mb-5">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="reset-code">Verification Code</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="text" id="reset-code" placeholder="123456" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-800 text-sm font-bold mb-2" for="new-password">New Password</label>
+                    <input
+                        class="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-700"
+                        type="password" id="new-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit"
+                    class="w-full bg-emerald-500 text-white font-bold py-2.5 rounded-md hover:bg-emerald-600 transition-colors">
+                    Reset & Login
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-sm text-gray-600">
+                <button onclick="toggleView('login')" class="text-[#2563eb] font-semibold hover:underline">Back to Sign
+                    In</button>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- AWS COGNITO CONFIGURATION ---
+        // TODO: Replace these with your actual AWS Cognito settings from the Setup Guide
+        const poolData = {
+            UserPoolId: 'ap-south-1_64nE3nYVD', // e.g. ap-south-1_AbC123
+            ClientId: '2bu3mj8l8ntgtqbcl9tlenpj3a' // e.g. 1a2b3c4d5e6f7g8h9i0j
+        };
+        const GOOGLE_AUTH_URL = "https://ap-south-164ne3nyvd.auth.ap-south-1.amazoncognito.com/oauth2/authorize?client_id=" + poolData.ClientId + "&response_type=token&scope=email+openid+profile&redirect_uri=" + encodeURIComponent(window.location.origin + '/index.html') + "&identity_provider=Google";
+        // ---------------------------------
+
+        let userPool;
+        let cognitoUser;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof AmazonCognitoIdentity !== 'undefined') {
+                userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+            }
+
+            // Re-route Google Sign in button
+            const googleBtn = document.querySelector('button:has(svg)');
+            if (googleBtn) {
+                googleBtn.onclick = (e) => {
+                    e.preventDefault();
+                    window.location.href = GOOGLE_AUTH_URL;
+                };
+            }
+        });
+
+        function toggleView(view) {
+            const views = ['loginForm', 'signupForm', 'confirmForm', 'forgotPasswordForm'];
+            views.forEach(v => {
+                document.getElementById(v).classList.remove('block');
+                document.getElementById(v).classList.add('hidden');
+            });
+            document.getElementById(view + 'Form').classList.remove('hidden');
+            document.getElementById(view + 'Form').classList.add('block');
+        }
+
+        // 1. Handle Login
+        function handleAuth(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
+                Username: email,
+                Password: password
+            });
+
+            var userData = {
+                Username: email,
+                Pool: userPool
+            };
+            cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+            const btn = event.target.querySelector('button');
+            btn.innerText = "Signing in...";
+
+            cognitoUser.authenticateUser(authenticationDetails, {
+                onSuccess: function (result) {
+                    localStorage.setItem('focusFlowAuth', 'true');
+                    localStorage.setItem('ff_token', result.getIdToken().getJwtToken());
+                    localStorage.setItem('ff_user', email);
+                    window.location.href = 'index.html';
+                },
+                onFailure: function (err) {
+                    alert(err.message || JSON.stringify(err));
+                    btn.innerText = "Sign In";
+                }
+            });
+        }
+
+        // 2. Handle Sign Up
+        function handleSignUp(event) {
+            event.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const name = document.getElementById('signup-name').value;
+
+            var attributeList = [];
+            var dataEmail = { Name: 'email', Value: email };
+            var dataName = { Name: 'name', Value: name };
+            attributeList.push(new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail));
+            attributeList.push(new AmazonCognitoIdentity.CognitoUserAttribute(dataName));
+
+            const btn = event.target.querySelector('button');
+            btn.innerText = "Registering...";
+
+            userPool.signUp(email, password, attributeList, null, function (err, result) {
+                btn.innerText = "Sign Up";
+                if (err) {
+                    alert(err.message || JSON.stringify(err));
+                    return;
+                }
+                cognitoUser = result.user;
+                alert("Sign up successful! Please check your email for the verification code.");
+                toggleView('confirm');
+                document.getElementById('confirm-code').focus();
+            });
+        }
+
+        // 3. Handle Confirmation
+        function handleConfirm(event) {
+            event.preventDefault();
+            const code = document.getElementById('confirm-code').value;
+            if (!cognitoUser) return alert("User reference lost. Refresh the page.");
+
+            cognitoUser.confirmRegistration(code, true, function (err, result) {
+                if (err) {
+                    alert(err.message || JSON.stringify(err));
+                    return;
+                }
+                alert("Email verified! You can now sign in.");
+                toggleView('login');
+            });
+        }
+
+        // 4. Handle Forgot Password Request
+        function handleForgotPassword(event) {
+            event.preventDefault();
+            const email = document.getElementById('forgot-email').value;
+            var userData = { Username: email, Pool: userPool };
+            cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+            cognitoUser.forgotPassword({
+                onSuccess: function (data) {
+                    document.getElementById('forgotReqForm').classList.replace('block', 'hidden');
+                    document.getElementById('forgotSubmitForm').classList.replace('hidden', 'block');
+                    alert("A reset code has been sent to your email.");
+                },
+                onFailure: function (err) {
+                    alert(err.message || JSON.stringify(err));
+                }
+            });
+        }
+
+        // 5. Handle Forgot Password Submit
+        function handleConfirmPassword(event) {
+            event.preventDefault();
+            const code = document.getElementById('reset-code').value;
+            const newPassword = document.getElementById('new-password').value;
+
+            cognitoUser.confirmPassword(code, newPassword, {
+                onSuccess: function () {
+                    alert("Password successfully reset! Please sign in with your new password.");
+                    toggleView('login');
+                },
+                onFailure: function (err) {
+                    alert(err.message || JSON.stringify(err));
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
