@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusFlow Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        @keyframes grow {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .tree-animate {
+            animation: grow 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-[#f4f7f6] h-screen flex flex-col overflow-hidden font-sans">
+
+    <header
+        class="bg-gradient-to-r from-[#244b8a] to-[#3b82f6] text-white flex justify-between items-center px-6 py-4 shadow-md z-20">
+        <div class="flex items-center gap-5">
+            <button onclick="toggleSidebar()" class="focus:outline-none hover:text-gray-200 transition-colors">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <h1 class="text-2xl font-semibold tracking-wide">FocusFlow</h1>
+        </div>
+
+        <div id="authContainer">
+            <a id="loginBtn" href="LoginPage.html"
+                class="bg-white text-[#244b8a] px-6 py-2 rounded font-bold shadow hover:bg-gray-100 transition-colors">
+                Sign Up / Sign In
+            </a>
+
+            <div id="userProfile" onclick="logout()"
+                class="hidden items-center gap-3 bg-white/10 px-4 py-2 rounded-lg cursor-pointer hover:bg-rose-500 hover:text-white transition-colors group"
+                title="Click to log out">
+                <div
+                    class="w-8 h-8 rounded-full bg-white text-[#244b8a] flex items-center justify-center font-bold text-sm group-hover:bg-white group-hover:text-rose-500 transition-colors">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="font-semibold tracking-wide group-hover:hidden">Ankit</span>
+                <span class="font-semibold tracking-wide hidden group-hover:inline">Log Out</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <aside id="sidebar"
+            class="w-20 bg-white flex flex-col py-6 border-r border-gray-200 shadow-sm z-10 overflow-y-auto transition-all duration-300 ease-in-out absolute md:relative h-full">
+            <nav class="flex flex-col w-full space-y-2">
+                <button onclick="navigate('home')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-home text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Home</span>
+                </button>
+                <button onclick="navigate('tracker')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-graduation-cap text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Attention
+                        Tracker</span>
+                </button>
+                <button onclick="navigate('data')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-university text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Recent Data</span>
+                </button>
+                <button onclick="navigate('history')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-book text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Data History</span>
+                </button>
+                <button onclick="navigate('forest')"
+                    class="flex items-center w-full px-6 py-4 text-gray-800 hover:bg-gray-50 hover:text-[#244b8a] transition-colors border-l-4 border-transparent hover:border-[#244b8a]">
+                    <i class="fas fa-tree text-2xl w-8 text-center"></i>
+                    <span class="sidebar-text hidden ml-4 text-sm font-semibold whitespace-nowrap">Focus Forest</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-8 overflow-y-auto w-full">
+
+            <section id="home" class="block max-w-5xl mx-auto animate-fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+
+                    <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-10 text-center border-b border-gray-100">
+                        <h2 class="text-4xl font-extrabold text-gray-900 mb-4">Master Your Focus</h2>
+                        <p class="text-lg text-gray-600 max-w-2xl mx-auto">FocusFlow provides real-time tracking of your
+                            attention and emotional states. Whether you are actively engaging in daily lectures,
+                            self-studying, or taking remote exams, FocusFlow helps you build better habits and maintain
+                            absolute concentration.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 p-10 border-b border-gray-100">
+                        <div class="text-center">
+                            <div
+                                class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#244b8a]">
+                                <i class="fas fa-camera text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 mb-2">Real-time Tracking</h3>
+                            <p class="text-gray-500 text-sm">Monitors head pose and eye gaze continuously to calculate
+                                your live Focus Score.</p>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-[#244b8a]">
+                                <i class="fas fa-chart-pie text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 mb-2">Emotion Analytics</h3>
+                            <p class="text-gray-500 text-sm">Understand how your expressions and mood impact your
+                                productivity over time.</p>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600">
+                                <i class="fas fa-tree text-2xl"></i>
+                            </div>
+                            <h3 class="font-bold text-gray-800 mb-2">Grow Your Forest</h3>
+                            <p class="text-gray-500 text-sm">Your attention level directly fuels your digital ecosystem.
+                                Earn trees after every session based on your focus score and build a thriving forest
+                                that visualizes your hard work.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-10 bg-gray-50">
+                        <h3 class="text-2xl font-bold text-center text-gray-800 mb-8">Built for Every Academic Need</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <i class="fas fa-book-reader text-2xl text-[#244b8a]"></i>
+                                    <h4 class="text-xl font-bold text-gray-800">Lectures & Study Sessions</h4>
+                                </div>
+                                <p class="text-gray-600 text-sm">Turn on the tracker during your daily studies to
+                                    measure your attention span. Identify when you start to lose focus so you can take
+                                    timed breaks and maximize your learning retention.</p>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <i class="fas fa-file-signature text-2xl text-rose-500"></i>
+                                    <h4 class="text-xl font-bold text-gray-800">Remote Examinations</h4>
+                                </div>
+                                <p class="text-gray-600 text-sm">Ensure academic integrity during tests. FocusFlow acts
+                                    as an exam-monitoring tool to track consistent screen presence and flag distracted
+                                    behavior during high-stakes assessments.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="tracker" class="hidden max-w-4xl mx-auto mt-8 w-full">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Attention Tracker</h2>
+
+                    <div id="recordingTimer"
+                        class="hidden text-rose-500 font-mono text-3xl font-bold mb-6 animate-pulse">00:00</div>
+
+                    <div
+                        class="bg-black w-full aspect-video rounded-xl overflow-hidden flex items-center justify-center relative mb-8 shadow-inner">
+                        <video id="webcam" autoplay playsinline class="w-full h-full object-cover hidden"></video>
+                        <span id="camera-placeholder" class="text-gray-400 font-medium tracking-widest uppercase">Camera
+                            Access Required</span>
+                    </div>
+
+                    <div class="flex justify-center gap-6">
+                        <button id="startBtn" onclick="startRecording()"
+                            class="px-8 py-3 bg-emerald-500 text-white font-bold rounded-lg shadow transition-colors hover:bg-emerald-600">
+                            Start Recording
+                        </button>
+                        <button id="stopBtn" onclick="stopRecording()"
+                            class="px-8 py-3 bg-gray-400 text-white font-bold rounded-lg shadow cursor-not-allowed transition-colors"
+                            disabled>
+                            Stop Recording
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="data" class="hidden max-w-5xl mx-auto mt-8 w-full">
+                <h2 class="text-3xl font-bold text-gray-800 mb-8">Your Recent Data</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Session Focus Trend</h3>
+                        <canvas id="lineChart"></canvas>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Emotion Distribution</h3>
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history" class="hidden max-w-5xl mx-auto mt-8 w-full">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800">Session History</h2>
+                        <select id="sessionDropdown" onchange="renderSessionDetails(this.value)"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                            <option value="">Loading Sessions...</option>
+                        </select>
+                    </div>
+
+                    <div id="sessionStats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 hidden">
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
+                            <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Final Focus
+                                Score</h3>
+                            <div id="histScore" class="text-4xl font-bold text-blue-600">--%</div>
+                        </div>
+                        <div class="bg-amber-50 p-6 rounded-xl border border-amber-100 text-center">
+                            <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Primary
+                                Emotion</h3>
+                            <div id="histEmotion" class="text-4xl font-bold text-amber-600">--</div>
+                        </div>
+                        <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100 text-center">
+                            <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Trees Earned
+                            </h3>
+                            <div id="histTrees" class="text-4xl font-bold text-emerald-600">--</div>
+                        </div>
+                    </div>
+
+                    <div id="sessionDetails" class="hidden flex-col gap-6">
+                        <div id="sessionMessage"
+                            class="hidden p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Session Focus Trend</h3>
+                                <canvas id="sessionLineChart"></canvas>
+                            </div>
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-4">Emotion Distribution</h3>
+                                <canvas id="sessionDoughnutChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-col items-center">
+                            <button id="toggleAdvancedBtn" onclick="toggleAdvancedAnalysis()"
+                                class="px-6 py-2 bg-white text-[#244b8a] rounded-full font-bold shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors flex items-center gap-2">
+                                <i class="fas fa-table"></i> View Advanced Analysis
+                            </button>
+                        </div>
+
+                        <div id="advancedAnalysisTable"
+                            class="hidden mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
+                            <div
+                                class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="font-bold text-gray-800"><i
+                                        class="fas fa-list-ul mr-2 text-[#244b8a]"></i>Detailed Timeline</h3>
+                            </div>
+                            <div class="max-h-96 overflow-y-auto w-full">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="sticky top-0 bg-white shadow-sm z-10">
+                                        <tr class="text-xs uppercase tracking-wider text-gray-500 bg-gray-50">
+                                            <th class="p-4 font-semibold">Time</th>
+                                            <th class="p-4 font-semibold">Focus Score</th>
+                                            <th class="p-4 font-semibold">Detected Emotion</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyTableBody" class="text-sm divide-y divide-gray-100">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="noSessionMsg" class="text-center text-gray-500 py-8">
+                        Loading your past sessions...
+                    </div>
+                </div>
+            </section>
+
+            <section id="forest" class="hidden max-w-5xl mx-auto mt-8 w-full">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Focus Forest</h2>
+                        <p class="text-gray-600">Plant trees based on your attention level. The higher your score, the
+                            more trees you earn!</p>
+                    </div>
+
+                    <div
+                        class="bg-emerald-50 p-6 rounded-xl border border-emerald-100 flex flex-col md:flex-row items-center justify-between mb-8 shadow-inner">
+                        <div class="mb-4 md:mb-0 text-center md:text-left">
+                            <p class="text-gray-700">Last Session Attention Score: <span id="sessionScoreDisplay"
+                                    class="font-bold text-2xl text-[#244b8a]">0%</span></p>
+                            <p class="text-gray-600 text-sm mt-1">You have earned <span id="pendingTreesDisplay"
+                                    class="font-bold text-emerald-600 text-lg">0</span> trees to plant.</p>
+                        </div>
+                        <button id="plantBtn" onclick="plantEarnedTrees()"
+                            class="px-6 py-3 bg-emerald-500 text-white font-bold rounded-lg shadow-md hover:bg-emerald-600 transition-colors flex items-center gap-2">
+                            <i class="fas fa-seedling"></i> Plant Now
+                        </button>
+                    </div>
+
+                    <div id="virtualForest"
+                        class="w-full min-h-[300px] bg-gradient-to-b from-blue-50 to-green-100 rounded-xl border border-gray-200 p-6 flex flex-wrap content-start gap-4">
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="authAlert" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center">
+            <i class="fas fa-lock text-4xl text-[#244b8a] mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Access Denied</h3>
+            <p class="text-gray-600 mb-6">You must be logged in to access the FocusFlow dashboard features.</p>
+            <div class="flex justify-center gap-4">
+                <button onclick="closeAlert()"
+                    class="px-6 py-2 bg-gray-200 text-gray-800 rounded font-semibold hover:bg-gray-300 transition-colors">Close</button>
+                <a href="LoginPage.html"
+                    class="px-6 py-2 bg-[#244b8a] text-white rounded font-semibold hover:bg-blue-800 transition-colors">Sign
+                    In Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AWS API CONFIGURATION ---
+        // TODO: Replace with your actual API Gateway Invoke URL from the Setup Guide
+        const API_GATEWAY_URL = 'https://anmg4iekh2.execute-api.ap-south-1.amazonaws.com/prod/process-frame';
+
+        // AWS Cognito Variables for Logout
+        const COGNITO_DOMAIN = 'https://ap-south-164ne3nyvd.auth.ap-south-1.amazoncognito.com';
+        const COGNITO_CLIENT_ID = '2bu3mj8l8ntgtqbcl9tlenpj3a';
+        // -----------------------------
+
+        let isSidebarOpen = false;
+        let stream = null;
+        let timerInterval = null;
+        let captureInterval = null;
+        let secondsElapsed = 0;
+        let unplantedTrees = 0;
+        let totalPlantedTrees = 0;
+        let lastSessionScore = 0;
+        let lineChartInstance = null;
+        let doughnutChartInstance = null;
+        let sessionLineChartInstance = null;
+        let sessionPieChartInstance = null;
+        let chartData = null;
+        let groupedSessions = []; // Global variable to hold grouped sessions
+
+        let isLoggedIn = localStorage.getItem('focusFlowAuth') === 'true';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for Google Sign-In redirect tokens in URL hash
+            const hash = window.location.hash.substring(1);
+            if (hash && hash.includes("id_token")) {
+                const params = new URLSearchParams(hash);
+                localStorage.setItem('focusFlowAuth', 'true');
+                localStorage.setItem('ff_token', params.get('id_token'));
+                // Decode JWT to get email/name
+                try {
+                    const base64Url = params.get('id_token').split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    const payload = JSON.parse(jsonPayload);
+                    localStorage.setItem('ff_user', payload.email || payload["cognito:username"] || "User");
+                } catch (e) {
+                    console.log(e);
+                }
+                isLoggedIn = true;
+                window.history.replaceState(null, null, 'index.html'); // clear hash
+            }
+            updateAuthDisplay();
+        });
+
+        function updateAuthDisplay() {
+            const loginBtn = document.getElementById('loginBtn');
+            const userProfile = document.getElementById('userProfile');
+
+            if (isLoggedIn) {
+                loginBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                userProfile.classList.add('flex');
+                // Set username
+                let userEmail = localStorage.getItem('ff_user') || 'User';
+                let shortName = userEmail.split('@')[0];
+                document.querySelector('#userProfile span.group-hover\\:hidden').innerText = shortName;
+            } else {
+                loginBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+                userProfile.classList.remove('flex');
+
+                const activeSections = document.querySelectorAll('main > section.block');
+                if (activeSections.length > 0 && activeSections[0].id !== 'home') {
+                    navigate('home');
+                }
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('focusFlowAuth');
+            localStorage.removeItem('ff_token');
+            localStorage.removeItem('ff_user');
+            isLoggedIn = false;
+
+            // Redirect to proper AWS Cognito Hosted UI Logout Endpoint to wipe the tracking cookie
+            const logoutUri = encodeURIComponent(window.location.origin + '/LoginPage.html');
+            window.location.href = `${COGNITO_DOMAIN}/logout?client_id=${COGNITO_CLIENT_ID}&logout_uri=${logoutUri}`;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const texts = document.querySelectorAll('.sidebar-text');
+
+            isSidebarOpen = !isSidebarOpen;
+
+            if (isSidebarOpen) {
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-64');
+                setTimeout(() => {
+                    texts.forEach(text => text.classList.remove('hidden'));
+                }, 150);
+            } else {
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-20');
+                texts.forEach(text => text.classList.add('hidden'));
+            }
+        }
+
+        function navigate(sectionId) {
+            if (!isLoggedIn && sectionId !== 'home') {
+                document.getElementById('authAlert').classList.remove('hidden');
+                return;
+            }
+
+            const sections = ['home', 'tracker', 'data', 'history', 'forest'];
+            sections.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('block');
+            });
+
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById(sectionId).classList.add('block');
+
+            if (sectionId === 'data') {
+                initializeCharts(); // Always refresh charts on entering view
+            } else if (sectionId === 'history') {
+                loadHistoryTable(); // Fetch completely new list of all sessions
+            } else if (sectionId === 'forest') {
+                syncForest(); // Recalculate trees dynamically
+            }
+        }
+
+        function closeAlert() {
+            document.getElementById('authAlert').classList.add('hidden');
+        }
+
+        function updateTimerDisplay() {
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            document.getElementById('recordingTimer').innerText = `${mins}:${secs}`;
+        }
+
+        async function startRecording() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const videoElement = document.getElementById('webcam');
+                const cameraPlaceholder = document.getElementById('camera-placeholder');
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const timerElement = document.getElementById('recordingTimer');
+
+                videoElement.srcObject = stream;
+                videoElement.classList.remove('hidden');
+                cameraPlaceholder.classList.add('hidden');
+
+                startBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                startBtn.classList.remove('hover:bg-emerald-600');
+                startBtn.disabled = true;
+                startBtn.classList.add('cursor-not-allowed');
+
+                stopBtn.classList.replace('bg-gray-400', 'bg-red-500');
+                stopBtn.classList.add('hover:bg-red-600');
+                stopBtn.disabled = false;
+                stopBtn.classList.remove('cursor-not-allowed');
+
+                secondsElapsed = 0;
+                updateTimerDisplay();
+                timerElement.classList.remove('hidden');
+
+                timerInterval = setInterval(() => {
+                    secondsElapsed++;
+                    updateTimerDisplay();
+                }, 1000);
+
+                // Setup AWS capture interval (10 seconds for testing)
+                captureInterval = setInterval(captureFrameAndSend, 10000);
+
+                // Trigger first capture immediately
+                setTimeout(captureFrameAndSend, 2000); // 2 second delay to let camera focus
+
+            } catch (err) {
+                alert("Camera access denied. Please allow permissions to use the tracker.");
+            }
+        }
+
+        function stopRecording() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                const videoElement = document.getElementById('webcam');
+                const cameraPlaceholder = document.getElementById('camera-placeholder');
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const timerElement = document.getElementById('recordingTimer');
+
+                videoElement.srcObject = null;
+                videoElement.classList.add('hidden');
+                cameraPlaceholder.classList.remove('hidden');
+
+                startBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
+                startBtn.classList.add('hover:bg-emerald-600');
+                startBtn.disabled = false;
+                startBtn.classList.remove('cursor-not-allowed');
+
+                stopBtn.classList.replace('bg-red-500', 'bg-gray-400');
+                stopBtn.classList.remove('hover:bg-red-600');
+                stopBtn.disabled = true;
+                stopBtn.classList.add('cursor-not-allowed');
+
+                clearInterval(timerInterval);
+                clearInterval(captureInterval);
+                timerElement.classList.add('hidden');
+
+                const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+                let scoresStr = localStorage.getItem('ff_unplanted_scores_' + userId) || '[]';
+                let scores = JSON.parse(scoresStr);
+                scores.push(lastSessionScore);
+                localStorage.setItem('ff_unplanted_scores_' + userId, JSON.stringify(scores));
+
+                unplantedTrees = scores.length;
+
+                document.getElementById('sessionScoreDisplay').innerText = lastSessionScore + '%';
+                document.getElementById('pendingTreesDisplay').innerText = unplantedTrees;
+
+                const plantBtn = document.getElementById('plantBtn');
+                if (unplantedTrees > 0) {
+                    plantBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
+                    plantBtn.classList.add('hover:bg-emerald-600');
+                    plantBtn.disabled = false;
+                    plantBtn.classList.remove('cursor-not-allowed');
+                } else {
+                    plantBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                    plantBtn.classList.remove('hover:bg-emerald-600');
+                    plantBtn.disabled = true;
+                    plantBtn.classList.add('cursor-not-allowed');
+                }
+
+                navigate('data'); // Triggers charts data fetch
+            }
+        }
+
+        async function captureFrameAndSend() {
+            const video = document.getElementById('webcam');
+            if (!video || video.classList.contains('hidden')) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'process',
+                        userId: userId,
+                        image: base64Image
+                    })
+                });
+                const result = await response.json();
+                console.log("Processed Frame Result:", result);
+                if (result.success && result.score !== undefined) {
+                    lastSessionScore = result.score;
+                }
+            } catch (e) {
+                console.error("Error sending frame to backend:", e);
+            }
+        }
+
+        function getTreeDOMElement(score, animate = false) {
+            const treeIcon = document.createElement('i');
+            let classes = ['fas'];
+
+            if (score >= 90) {
+                // Mythical/Golden Tree
+                classes.push('fa-tree', 'text-6xl', 'text-yellow-400', 'drop-shadow-[0_0_15px_rgba(250,204,21,0.8)]');
+            } else if (score >= 70) {
+                // Majestic Oak
+                classes.push('fa-tree', 'text-5xl', 'text-emerald-600', 'drop-shadow-md');
+            } else if (score >= 40) {
+                // Standard Pine
+                classes.push('fa-tree', 'text-4xl', 'text-emerald-500');
+            } else {
+                // Struggling Seedling
+                classes.push('fa-seedling', 'text-3xl', 'text-amber-700');
+            }
+
+            treeIcon.className = classes.join(' ');
+            if (animate) treeIcon.classList.add('tree-animate');
+            return treeIcon;
+        }
+
+        function plantEarnedTrees() {
+            if (unplantedTrees > 0) {
+                const forest = document.getElementById('virtualForest');
+                const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+                let scoresStr = localStorage.getItem('ff_unplanted_scores_' + userId) || '[]';
+                let scores = JSON.parse(scoresStr);
+
+                // Ensure the empty state message is removed before adding trees
+                if (forest.querySelector('p')) {
+                    forest.innerHTML = '';
+                }
+
+                scores.forEach(score => {
+                    forest.appendChild(getTreeDOMElement(score, true));
+                });
+
+                unplantedTrees = 0;
+                localStorage.setItem('ff_unplanted_scores_' + userId, '[]');
+
+                document.getElementById('pendingTreesDisplay').innerText = '0';
+                document.getElementById('sessionScoreDisplay').innerText = '0%';
+
+                const plantBtn = document.getElementById('plantBtn');
+                plantBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                plantBtn.classList.remove('hover:bg-emerald-600');
+                plantBtn.disabled = true;
+                plantBtn.classList.add('cursor-not-allowed');
+            }
+        }
+
+        async function syncForest() {
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+            const forest = document.getElementById('virtualForest');
+            const pDisplay = document.getElementById('pendingTreesDisplay');
+            const plantBtn = document.getElementById('plantBtn');
+
+            forest.innerHTML = '<p class="text-gray-500 italic w-full text-center py-4">Loading forest data...</p>';
+
+            let scoresStr = localStorage.getItem('ff_unplanted_scores_' + userId) || '[]';
+            let unplantedScores = JSON.parse(scoresStr);
+            unplantedTrees = unplantedScores.length;
+            pDisplay.innerText = unplantedTrees;
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'history', userId: userId })
+                });
+                const result = await response.json();
+
+                let totalLifetimeTrees = 0;
+                let sessionScores = [];
+
+                if (result.data && result.data.length > 0) {
+                    const sortedData = result.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    let currentSession = [];
+                    let sessions = [];
+
+                    for (let i = 0; i < sortedData.length; i++) {
+                        if (currentSession.length === 0) { currentSession.push(sortedData[i]); }
+                        else {
+                            const lastTime = new Date(currentSession[currentSession.length - 1].timestamp).getTime();
+                            const currTime = new Date(sortedData[i].timestamp).getTime();
+                            if (currTime - lastTime > 5 * 60 * 1000) {
+                                sessions.push(currentSession);
+                                currentSession = [sortedData[i]];
+                            } else {
+                                currentSession.push(sortedData[i]);
+                            }
+                        }
+                    }
+                    if (currentSession.length > 0) sessions.push(currentSession);
+
+                    sessions.forEach(session => {
+                        let scoreSum = 0;
+                        session.forEach(i => scoreSum += i.score);
+                        let avgScore = scoreSum / session.length;
+                        sessionScores.push(avgScore);
+                    });
+                    totalLifetimeTrees = sessionScores.length;
+                }
+
+                totalPlantedTrees = totalLifetimeTrees - unplantedTrees;
+                if (totalPlantedTrees < 0) totalPlantedTrees = 0;
+
+                forest.innerHTML = '';
+                if (totalPlantedTrees === 0) {
+                    forest.innerHTML = '<p class="text-gray-400 italic w-full text-center py-10">No trees planted yet. Complete a session to start growing your forest!</p>';
+                } else {
+                    for (let i = 0; i < totalPlantedTrees; i++) {
+                        forest.appendChild(getTreeDOMElement(sessionScores[i], false));
+                    }
+                }
+
+            } catch (e) {
+                console.error("Forest history sync failed:", e);
+                forest.innerHTML = '<p class="text-rose-500 text-center w-full py-4">Failed to load trees from AWS</p>';
+            }
+
+            if (unplantedTrees > 0) {
+                plantBtn.classList.replace('bg-gray-400', 'bg-emerald-500');
+                plantBtn.classList.add('hover:bg-emerald-600');
+                plantBtn.disabled = false;
+                plantBtn.classList.remove('cursor-not-allowed');
+            } else {
+                plantBtn.classList.replace('bg-emerald-500', 'bg-gray-400');
+                plantBtn.classList.remove('hover:bg-emerald-600');
+                plantBtn.disabled = true;
+                plantBtn.classList.add('cursor-not-allowed');
+            }
+        }
+
+        async function loadHistoryTable() {
+            document.getElementById('noSessionMsg').classList.remove('hidden');
+            document.getElementById('noSessionMsg').innerText = "Loading your past sessions...";
+            document.getElementById('sessionStats').classList.add('hidden');
+            document.getElementById('sessionDetails').classList.add('hidden');
+            document.getElementById('sessionDropdown').innerHTML = '<option value="">Select a Session</option>';
+
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'history', userId: userId })
+                });
+                const result = await response.json();
+
+                if (result.data && result.data.length > 0) {
+                    const sortedData = result.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    groupedSessions = [];
+                    let currentSession = [];
+
+                    for (let i = 0; i < sortedData.length; i++) {
+                        if (currentSession.length === 0) {
+                            currentSession.push(sortedData[i]);
+                        } else {
+                            const lastTime = new Date(currentSession[currentSession.length - 1].timestamp).getTime();
+                            const currTime = new Date(sortedData[i].timestamp).getTime();
+                            // If gap is more than 5 minutes, treat it as a new session
+                            if (currTime - lastTime > 5 * 60 * 1000) {
+                                groupedSessions.push(currentSession);
+                                currentSession = [sortedData[i]];
+                            } else {
+                                currentSession.push(sortedData[i]);
+                            }
+                        }
+                    }
+                    if (currentSession.length > 0) groupedSessions.push(currentSession);
+
+                    if (groupedSessions.length > 0) {
+                        document.getElementById('noSessionMsg').classList.add('hidden');
+                        const dropdown = document.getElementById('sessionDropdown');
+                        let html = '';
+                        groupedSessions.forEach((session, idx) => {
+                            const date = new Date(session[0].timestamp).toLocaleDateString();
+                            html += `<option value="${idx}">Session ${idx + 1} (${date})</option>`;
+                        });
+                        dropdown.innerHTML = html;
+
+                        // Select the most recent session by default
+                        dropdown.value = groupedSessions.length - 1;
+                        renderSessionDetails(groupedSessions.length - 1);
+                    }
+                } else {
+                    document.getElementById('noSessionMsg').innerText = "No session history yet. Start a tracking session!";
+                }
+            } catch (e) {
+                console.error("Failed to load history table:", e);
+                document.getElementById('noSessionMsg').innerText = "Failed to load history from AWS.";
+            }
+        }
+
+        function renderSessionDetails(sessionIndex) {
+            if (sessionIndex === "" || !groupedSessions[sessionIndex]) return;
+
+            document.getElementById('noSessionMsg').classList.add('hidden');
+            const session = groupedSessions[sessionIndex];
+
+            // Calculate aggregate stats
+            let totalScore = 0;
+            let emotionCounts = {};
+            session.forEach(item => {
+                totalScore += item.score;
+                emotionCounts[item.emotion] = (emotionCounts[item.emotion] || 0) + 1;
+            });
+            const avgScore = Math.round(totalScore / session.length);
+
+            // Find most frequent primary emotion
+            let primaryEmotion = 'UNKNOWN';
+            let maxCount = 0;
+            for (let em in emotionCounts) {
+                if (emotionCounts[em] > maxCount) { maxCount = emotionCounts[em]; primaryEmotion = em; }
+            }
+
+            // Calculate trees
+            let treesToPlant = 1;
+
+            // Update UI
+            document.getElementById('histScore').innerText = `${avgScore}%`;
+            document.getElementById('histEmotion').innerText = primaryEmotion;
+            document.getElementById('histTrees').innerText = treesToPlant;
+
+            const msgDiv = document.getElementById('sessionMessage');
+            msgDiv.classList.remove('hidden');
+            if (avgScore >= 70) {
+                msgDiv.className = 'p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4 bg-emerald-50 text-emerald-800 border-emerald-200';
+                const quotes = [
+                    "Fantastic focus! Keep up the great work.",
+                    "You're building an incredible attention span.",
+                    "Success is the sum of small efforts, repeated day in and day out!"
+                ];
+                msgDiv.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+            } else if (avgScore >= 40) {
+                msgDiv.className = 'p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4 bg-amber-50 text-amber-800 border-amber-200';
+                msgDiv.innerText = "Good effort, but there's room for improvement. Try eliminating external distractions.";
+            } else {
+                msgDiv.className = 'p-4 rounded-xl text-center font-semibold text-lg shadow-sm border mb-4 bg-rose-50 text-rose-800 border-rose-200';
+                msgDiv.innerText = "Your focus struggled this session. Consider taking a short break and returning refreshed!";
+            }
+
+            let chartLabels = [];
+            let focusData = [];
+            let chartEmotionCounts = { 'Highly Focused': 0, 'Confused': 0, 'Sad': 0, 'Distracted': 0 };
+
+            session.forEach(item => {
+                const date = new Date(item.timestamp);
+                chartLabels.push(`${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`);
+                focusData.push(item.score);
+
+                if (item.emotion === 'CALM' || item.emotion === 'HAPPY') chartEmotionCounts['Highly Focused']++;
+                else if (item.emotion === 'CONFUSED') chartEmotionCounts['Confused']++;
+                else if (item.emotion === 'SAD' || item.emotion === 'ANGRY') chartEmotionCounts['Sad']++;
+                else chartEmotionCounts['Distracted']++;
+            });
+
+            if (Object.values(chartEmotionCounts).reduce((a, b) => a + b, 0) === 0) chartEmotionCounts['Highly Focused'] = 1;
+
+            if (sessionLineChartInstance) sessionLineChartInstance.destroy();
+            if (sessionPieChartInstance) sessionPieChartInstance.destroy();
+
+            sessionLineChartInstance = new Chart(document.getElementById('sessionLineChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Focus Score', data: focusData,
+                        borderColor: '#244b8a', backgroundColor: 'rgba(36, 75, 138, 0.1)', tension: 0.4, fill: true
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            sessionPieChartInstance = new Chart(document.getElementById('sessionDoughnutChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Highly Focused', 'Confused', 'Sad', 'Distracted'],
+                    datasets: [{
+                        data: [chartEmotionCounts['Highly Focused'], chartEmotionCounts['Confused'], chartEmotionCounts['Sad'], chartEmotionCounts['Distracted']],
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'], borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'right' } }, cutout: '70%' }
+            });
+
+            // Build Advanced Analysis Table
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            session.forEach(item => {
+                const date = new Date(item.timestamp);
+                const isGoodFocus = item.score > 70;
+
+                let emotionBadgeClass = 'bg-gray-100 text-gray-800';
+                if (item.emotion === 'HAPPY' || item.emotion === 'CALM') emotionBadgeClass = 'bg-emerald-100 text-emerald-800';
+                else if (item.emotion === 'CONFUSED') emotionBadgeClass = 'bg-amber-100 text-amber-800';
+                else if (item.emotion === 'SAD' || item.emotion === 'ANGRY') emotionBadgeClass = 'bg-rose-100 text-rose-800';
+                else if (item.emotion === 'SURPRISED') emotionBadgeClass = 'bg-purple-100 text-purple-800';
+
+                const row = `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 text-gray-600 font-medium">${date.toLocaleTimeString()}</td>
+                        <td class="p-4 font-bold ${isGoodFocus ? 'text-emerald-500' : 'text-rose-500'}">${item.score}%</td>
+                        <td class="p-4"><span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${emotionBadgeClass}">${item.emotion}</span></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            // Ensure table is hidden when a new session is clicked
+            document.getElementById('advancedAnalysisTable').classList.add('hidden');
+
+            document.getElementById('sessionStats').classList.remove('hidden');
+            document.getElementById('sessionDetails').classList.remove('hidden');
+            document.getElementById('sessionDetails').classList.add('flex');
+        }
+
+        function toggleAdvancedAnalysis() {
+            const tableContainer = document.getElementById('advancedAnalysisTable');
+            if (tableContainer.classList.contains('hidden')) {
+                tableContainer.classList.remove('hidden');
+            } else {
+                tableContainer.classList.add('hidden');
+            }
+        }
+
+        async function initializeCharts() {
+            // First fetch real data from AWS API Gateway
+            const userId = localStorage.getItem('ff_user') || 'anonymous_user';
+            let chartLabels = [];
+            let focusData = [];
+            let emotionCounts = {
+                'Highly Focused': 0,
+                'Confused': 0,
+                'Sad': 0,
+                'Distracted': 0
+            };
+
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'history', userId: userId })
+                });
+                const result = await response.json();
+
+                if (result.data && result.data.length > 0) {
+                    const sortedData = result.data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    let currentSession = [];
+                    let sessions = [];
+
+                    for (let i = 0; i < sortedData.length; i++) {
+                        if (currentSession.length === 0) {
+                            currentSession.push(sortedData[i]);
+                        } else {
+                            const lastTime = new Date(currentSession[currentSession.length - 1].timestamp).getTime();
+                            const currTime = new Date(sortedData[i].timestamp).getTime();
+                            if (currTime - lastTime > 5 * 60 * 1000) {
+                                sessions.push(currentSession);
+                                currentSession = [sortedData[i]];
+                            } else {
+                                currentSession.push(sortedData[i]);
+                            }
+                        }
+                    }
+                    if (currentSession.length > 0) sessions.push(currentSession);
+
+                    const latestSession = sessions[sessions.length - 1]; // Only get the real latest session
+
+                    chartLabels = latestSession.map(item => {
+                        const date = new Date(item.timestamp);
+                        // Using HH:MM:SS for the chart labels
+                        return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+                    });
+                    focusData = latestSession.map(item => item.score);
+
+                    emotionCounts = { 'Highly Focused': 0, 'Confused': 0, 'Sad': 0, 'Distracted': 0 };
+                    latestSession.forEach(item => {
+                        if (item.emotion === 'CALM' || item.emotion === 'HAPPY') emotionCounts['Highly Focused']++;
+                        else if (item.emotion === 'CONFUSED') emotionCounts['Confused']++;
+                        else if (item.emotion === 'SAD' || item.emotion === 'ANGRY') emotionCounts['Sad']++;
+                        else emotionCounts['Distracted']++;
+                    });
+
+                    // Prevent division by zero pie chart issues
+                    if (Object.values(emotionCounts).reduce((a, b) => a + b, 0) === 0) {
+                        emotionCounts['Highly Focused'] = 1;
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to fetch history, falling back to dummy data", e);
+            }
+
+            // Destroy existing charts to explicitly re-draw fresh data without caching issues
+            if (lineChartInstance) lineChartInstance.destroy();
+            if (doughnutChartInstance) doughnutChartInstance.destroy();
+
+            const ctxLine = document.getElementById('lineChart').getContext('2d');
+            lineChartInstance = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Focus Score',
+                        data: focusData,
+                        borderColor: '#244b8a',
+                        backgroundColor: 'rgba(36, 75, 138, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+            doughnutChartInstance = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Highly Focused', 'Confused', 'Sad', 'Distracted'],
+                    datasets: [{
+                        data: [
+                            emotionCounts['Highly Focused'],
+                            emotionCounts['Confused'],
+                            emotionCounts['Sad'],
+                            emotionCounts['Distracted']
+                        ],
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'right' } },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
